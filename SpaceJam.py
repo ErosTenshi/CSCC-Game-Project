@@ -1,6 +1,6 @@
 from direct.showbase.ShowBase import ShowBase
 
-class SetupScene(ShowBase):
+class MyGame(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
 
@@ -11,7 +11,7 @@ class SetupScene(ShowBase):
         tex = self.loader.loadTexture("Assets/Universe/Universe.jpg")
         self.Universe.setTexture(tex, 1)
         
-        # Sets up Planet 1 model and texture
+        # Sets up Planet 1 model, texture, and location/position
         self.Planet1 = self.loader.loadModel("Assets/Planets/protoPlanet.x")
         self.Planet1.reparentTo(self.render)
         self.Planet1.setPos(150, 5000, 67)
@@ -53,6 +53,24 @@ class SetupScene(ShowBase):
         self.Planet6.setScale(350)
         tex = self.loader.loadTexture("Assets/Planets/PlanetSangre.png")
         self.Planet6.setTexture(tex, 1)
+        
+        # Sets up Space Station model, texture, and location/position
+        self.SpaceStation = self.loader.loadModel("Assets/SpaceStation/spaceStation.x")
+        self.SpaceStation.reparentTo(self.render)
+        self.SpaceStation.setPos(50, 200, 0)
+        self.SpaceStation.setScale(1)
+        tex = self.loader.loadTexture("Assets/SpaceStation/SpaceStation1_Dif2.png")
+        self.SpaceStation.setTexture(tex, 1)
+        
+        # Sets up Spaceship model, texture, and location/position
+        self.Spaceship = self.loader.loadModel("Assets/Spaceships/Dumbledore.x")
+        self.Spaceship.reparentTo(self.render)
+        self.Spaceship.setPos(50, 150, 0)
+        self.Spaceship.setScale(2)
+        tex = self.loader.loadTexture("Assets/Spaceships/spacejet_C.png")
+        self.Spaceship.setTexture(tex, 1)
+        
+        
 
-app = SetupScene()
+app = MyGame()
 app.run()
