@@ -4,12 +4,14 @@ class SetupScene(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
 
+        # Sets up Universe model and texture
         self.Universe = self.loader.loadModel("Assets/Universe/Universe.x")
         self.Universe.reparentTo(self.render)
         self.Universe.setScale(15000)
         tex = self.loader.loadTexture("Assets/Universe/Universe.jpg")
         self.Universe.setTexture(tex, 1)
         
+        # Sets up Planet 1 model and texture
         self.Planet1 = self.loader.loadModel("Assets/Planets/protoPlanet.x")
         self.Planet1.reparentTo(self.render)
         self.Planet1.setPos(150, 5000, 67)
