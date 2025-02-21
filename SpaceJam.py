@@ -4,10 +4,11 @@ import SpaceJamClasses as spaceJamClasses
 from panda3d.core import Vec3
 import math, random, sys
 
+
+
 class MyGame(ShowBase):
     def __init__(self):
         ShowBase.__init__(self)
-
         # Sets up Universe model and texture
         self.Universe = spaceJamClasses.Universe(self.loader, "Assets/Universe/Universe.x", self.render, 'Universe', "Assets/Universe/Universe.jpg", (0, 0, 0), 15000)
         
@@ -26,14 +27,17 @@ class MyGame(ShowBase):
         
         # Sets up Space Station model, texture, and location/position
         self.SpaceStation = spaceJamClasses.SpaceStation(self.loader, "Assets/SpaceStation/spaceStation.x", self.render, 'Space Station', "Assets/SpaceStation/SpaceStation1_Dif2.png", (1500, 1000, -100), 40)
-       
+
         # Sets up Spaceship model, texture, and location/position.
         self.SpaceShip = spaceJamClasses.SpaceShip(self.loader, "Assets/Spaceships/spacejet.3ds", self.render, 'Space Ship', "Assets/Spaceships/spacejet_C.png", Vec3(1000, 1200, -550), 50)
+        self.SpaceShip.SetKeyBindings()
+        
         self.Drone = spaceJamClasses.Drone(self.loader, "Assets/DroneDefender/DroneDefender.x", self.render, 'Drones', "Assets/DroneDefender/Drones.jpg", (1000, 1200, 0), 50)
         
-        
-        
         self.CircleDrone = self.loader.loadModel("Assets/DroneDefender/DroneDefender.x")
+        
+        
+        
         
         x = 0
         for i in range(105):
@@ -74,7 +78,8 @@ class MyGame(ShowBase):
 
             self.DrawCloudDefense(self.Planet1, nickName)
             self.DrawBaseballSeams(self.SpaceStation, nickName, j, fullCycle, 2)
-            
+     
+        
     def DrawBaseballSeams(self, centralObject, droneName, step, numSeams, radius = 1):
         unitVec = defensePaths.BaseballSeams(step, numSeams, B = 0.4)
         unitVec.normalize()
@@ -87,20 +92,18 @@ class MyGame(ShowBase):
         position = unitVec * 500 + centralObject.modelNode.getPos()
         spaceJamClasses.Drone(self.loader, "Assets/DroneDefender/DroneDefender.obj", self.render, droneName, "Assets/DroneDefender/octotoad1_auv.png", position, 10)
     
+    def SetCamera(self):
+        self.disableMouse()
+        self.camera.reparentTo(self.SpaceShip.modelNode)
+        self.camera.setFluidPos(0, 1, 0)
     
         
         
         
     def quit(self):
-        sys.exit
-        
-        
-        
-        
-        
-        
-        
+        sys.exit()  
         
 
 app = MyGame()
+app.SetCamera()
 app.run()
