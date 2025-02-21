@@ -6,7 +6,7 @@ def Cloud(radius = 1):
     y = 2 * random.random() - 1
     z = 2 * random.random() - 1
     
-    unitVec = Vec3 (x, y, z)
+    unitVec = Vec3(x, y, z)
     unitVec.normalize()
     return unitVec * radius
 
