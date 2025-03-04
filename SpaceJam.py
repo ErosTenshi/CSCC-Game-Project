@@ -1,8 +1,11 @@
 from direct.showbase.ShowBase import ShowBase
 import DefensePaths as defensePaths
 import SpaceJamClasses as spaceJamClasses
-from panda3d.core import Vec3
+import SpaceShip 
+from typing import Callable
+from panda3d.core import CollisionTraverser, CollisionHandlerPusher, CollisionNode, Vec3
 import math, random, sys
+from direct.task import Task
 
 
 
@@ -29,13 +32,19 @@ class MyGame(ShowBase):
         self.SpaceStation = spaceJamClasses.SpaceStation(self.loader, "Assets/SpaceStation/spaceStation.x", self.render, 'Space Station', "Assets/SpaceStation/SpaceStation1_Dif2.png", (1500, 1000, -100), 40)
 
         # Sets up Spaceship model, texture, and location/position.
-        self.SpaceShip = spaceJamClasses.SpaceShip(self.loader, "Assets/Spaceships/spacejet.3ds", self.render, 'Space Ship', "Assets/Spaceships/spacejet_C.png", Vec3(1000, 1200, -550), 50)
+        self.SpaceShip = SpaceShip.Player(self.loader, self.taskMgr, self.accept, "Assets/Spaceships/spacejet.3ds", self.render, 'Space Ship', "Assets/Spaceships/spacejet_C.png", Vec3(1000, 1200, -550), 50)
         self.SpaceShip.SetKeyBindings()
         
         self.Drone = spaceJamClasses.Drone(self.loader, "Assets/DroneDefender/DroneDefender.x", self.render, 'Drones', "Assets/DroneDefender/Drones.jpg", (1000, 1200, 0), 50)
         
         self.CircleDrone = self.loader.loadModel("Assets/DroneDefender/DroneDefender.x")
         
+        self.cTrav = CollisionTraverser()
+        self.cTrav.traverse(self.render)
+        self.pusher = CollisionHandlerPusher()
+        self.pusher.addCollider(self.SpaceShip.collisionNode, self.SpaceShip.modelNode)
+        self.cTrav.addCollider(self.SpaceShip.collisionNode, self.pusher)
+        self.cTrav.showCollisions(self.render)
         
         
         
