@@ -3,9 +3,11 @@ import DefensePaths as defensePaths
 import SpaceJamClasses as spaceJamClasses
 import SpaceShip 
 from typing import Callable
-from panda3d.core import CollisionTraverser, CollisionHandlerPusher, CollisionNode, Vec3
+from panda3d.core import CollisionTraverser, CollisionHandlerPusher, CollisionNode, Vec3, TextNode
 import math, random, sys
 from direct.task import Task
+from direct.gui.OnscreenText import OnscreenText
+from direct.gui.DirectGui import DirectFrame, DirectButton
 
 
 class MyGame(ShowBase):
@@ -30,24 +32,33 @@ class MyGame(ShowBase):
         # Sets up Space Station model, texture, and location/position
         self.SpaceStation = spaceJamClasses.SpaceStation(self.loader, "Assets/SpaceStation/spaceStation.x", self.render, 'Space Station', "Assets/SpaceStation/SpaceStation1_Dif2.png", (1500, 1000, -100), 40)
 
-        # Sets up Spaceship model, texture, and location/position.
-        self.SpaceShip = SpaceShip.Player(self.loader, self.taskMgr, self.accept, "Assets/Spaceships/spacejet.3ds", self.render, 'Space Ship', "Assets/Spaceships/spacejet_C.png", Vec3(1000, 1200, -550), 50, self.render)
-        self.SpaceShip.SetKeyBindings()
-        
-        self.Drone = spaceJamClasses.Drone(self.loader, "Assets/DroneDefender/DroneDefender.x", self.render, 'Drones', "Assets/DroneDefender/Drones.jpg", (1000, 1200, 0), 50)
-        
-        self.CircleDrone = self.loader.loadModel("Assets/DroneDefender/DroneDefender.x")
-        
         self.cTrav = CollisionTraverser()
         self.cTrav.traverse(self.render)
+        # Sets up Spaceship model, texture, and location/position.
+        self.SpaceShip = SpaceShip.Player(self.cTrav, self.loader, self.taskMgr, self.accept, "Assets/Spaceships/spacejet.3ds", self.render, 'Space Ship', "Assets/Spaceships/spacejet_C.png", Vec3(1000, 1200, -550), 50, self.render)
+        self.SpaceShip.SetKeyBindings()
+        
+        self.Drone = spaceJamClasses.Drone(self.loader, "Assets/DroneDefender/DroneDefender.x", self.render, 'Drone', "Assets/DroneDefender/Drones.jpg", (1000, 1200, 0), 50)
+        
+        self.CircleDrone = self.loader.loadModel("Assets/DroneDefender/DroneDefender.x", 1)
+        
+        
         self.pusher = CollisionHandlerPusher()
         self.pusher.addCollider(self.SpaceShip.collisionNode, self.SpaceShip.modelNode)
         self.cTrav.addCollider(self.SpaceShip.collisionNode, self.pusher)
         self.cTrav.showCollisions(self.render)
         
+        self.elapsed_time = 0
+        self.timer_text = OnscreenText(text="Time: 0s", pos=(-1.2, 0.9), scale=0.07, fg=(1, 1, 1, 1), align=TextNode.A_left)
+        self.droneExplodeCount_text = OnscreenText(text="Destroyed Drones: " + str(SpaceShip.Player.droneExplodeCount), pos=(-1.2, 0.8), scale=0.07, fg=(1, 1, 1, 1), align=TextNode.A_left)
+        self.taskMgr.add(self.update_timer, "updateTimerTask")
         
-        
-        
+        self.exit_menu = DirectFrame(frameColor=(0, 0, 0, 0.7), frameSize=(-0.5, 0.5, -0.3, 0.3), pos=(0, 0, 0))
+        self.exit_button = DirectButton(text="Exit Game", scale=0.07, pos=(0, 0, 0.1), command=self.quit_game, parent=self.exit_menu)
+        self.cancel_button = DirectButton(text="Cancel", scale=0.07, pos=(0, 0, -0.1), command=self.hide_exit_menu, parent=self.exit_menu)
+        self.exit_menu.hide()
+        self.accept("escape", self.show_exit_menu)
+          
         x = 0
         for i in range(105):
             theta = x
@@ -82,12 +93,32 @@ class MyGame(ShowBase):
         fullCycle = 60
         
         for j in range(fullCycle): 
-            spaceJamClasses.Drone.droneCount += 0
+            spaceJamClasses.Drone.droneCount += 2
             nickName = "Drone" + str(spaceJamClasses.Drone.droneCount)
 
             self.DrawCloudDefense(self.Planet1, nickName)
+            nickName = "Drone" + str(spaceJamClasses.Drone.droneCount + 1)
             self.DrawBaseballSeams(self.SpaceStation, nickName, j, fullCycle, 2)
-     
+        
+    def show_exit_menu(self):
+        self.exit_menu.show()
+    
+    def hide_exit_menu(self):
+        self.exit_menu.hide() 
+    
+    def quit_game(self):
+        sys.exit()
+    
+    def update_timer(self, task):
+        self.elapsed_time = int(task.time)
+        self.timer_text.setText(f"Time: {self.elapsed_time}s")
+        return task.cont
+        
+    def update_droneExplodeCount(self):
+        SpaceShip.Player.droneExplodeCount += 1
+        self.droneExplodeCount_text.setText(f"Drones Destroyed: {SpaceShip.Player.droneExplodeCount}")
+        
+    
         
     def DrawBaseballSeams(self, centralObject, droneName, step, numSeams, radius = 1):
         unitVec = defensePaths.BaseballSeams(step, numSeams, B = 0.4)
