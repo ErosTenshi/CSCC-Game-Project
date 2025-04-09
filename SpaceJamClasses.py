@@ -4,7 +4,7 @@ from panda3d.core import NodePath, Vec3, Loader
 from direct.task.Task import TaskManager
 import DefensePaths as defensePaths
 from CollideObjectBase import PlacedObject, CollidableObject, InverseSphereCollideObject, CapsuleCollidableObject, SphereCollideObject
-
+from direct.interval.IntervalGlobal import Sequence
 
 class Planet(SphereCollideObject):
     def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, nodeName: str, texPath: str, posVec: Vec3, scaleVec: float):
@@ -102,5 +102,44 @@ class Orbiter(SphereCollideObject):
         self.modelNode.lookAt(self.staringAt.modelNode)
         return task.cont
     
+class Wanderer(SphereCollideObject):
+    numWanderers = 0
+    
+    def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, modelName: str, scaleVec: Vec3, texPath: str, staringAt: Vec3):
+        super(Wanderer, self).__init__(loader, modelPath, parentNode,modelName, Vec3(0, 0, 0), 3.2)
+        
+        self.modelNode.setScale(scaleVec)
+        tex = loader.loadTexture(texPath)
+        self.modelNode.setTexture(tex, 1)
+        self.staringAt = staringAt
+        Wanderer.numWanderers += 1
+
+        posInterval0 = self.modelNode.posInterval(20, Vec3(300, 6000, 500), startPos = Vec3(0, 0, 0))
+        posInterval1 = self.modelNode.posInterval(20, Vec3(700, -2000, 100), startPos = Vec3(300, 6000, 500))
+        posInterval2 = self.modelNode.posInterval(20, Vec3(0, -900, -1400), startPos = Vec3(700, -2000, 100))
+        
+        self.travelRoute = Sequence(posInterval0, posInterval1, posInterval2, name = "Traveler")
+        
+        self.travelRoute.loop()
+
+class Wanderer2(SphereCollideObject):
+    numWanderers2 = 0
+    
+    def __init__(self, loader: Loader, modelPath: str, parentNode: NodePath, modelName: str, scaleVec: Vec3, texPath: str, staringAt: Vec3):
+        super(Wanderer2, self).__init__(loader, modelPath, parentNode,modelName, Vec3(0, 0, 0), 6.2)
+        
+        self.modelNode.setScale(scaleVec)
+        tex = loader.loadTexture(texPath)
+        self.modelNode.setTexture(tex, 1)
+        self.staringAt = staringAt
+        Wanderer2.numWanderers2 += 1
+
+        posInterval3 = self.modelNode.posInterval(20, Vec3(450, 6150, 650), startPos = Vec3(0, 0, 0))
+        posInterval4 = self.modelNode.posInterval(20, Vec3(850, -2150, 250), startPos = Vec3(300, 6000, 500))
+        posInterval5 = self.modelNode.posInterval(20, Vec3(0, -900, -1400), startPos = Vec3(700, -2000, 100))
+        
+        self.travelRoute2 = Sequence(posInterval3, posInterval4, posInterval5, name = "Traveler2")
+        
+        self.travelRoute2.loop()
         
       
