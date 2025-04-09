@@ -8,6 +8,8 @@ from typing import Callable
 from direct.task import Task
 from SpaceJamClasses import Missile
 from direct.gui.OnscreenImage import OnscreenImage, TransparencyAttrib
+from direct.gui.DirectGui import DirectWaitBar
+from direct.gui.OnscreenText import OnscreenText
 
 class Player(SphereCollideObject):
     droneExplodeCount = 0
@@ -26,6 +28,17 @@ class Player(SphereCollideObject):
         self.missileBay = 1 # only one missile in the missile bay to be launched
         tex = loader.loadTexture(texPath)
         self.modelNode.setTexture(tex, 1)
+        
+        self.maxBoost = 5.0     
+        self.boostLeft = self.maxBoost
+        self.boosting = False
+        self.boostCooldown = False
+        self.boostSpeedMultiplier = 2.5  
+        self.boostRate = 10             
+        self.boostRechargeRate = 2      
+        self.normalRate = 5             
+
+        self.SetupBoostHUD()
         
         self.cntExplode = 0
         self.explodeIntervals = {}
@@ -60,6 +73,7 @@ class Player(SphereCollideObject):
         self.accept('shift', self.ThrustDown, [1])
         self.accept('shift-up', self.ThrustDown, [0])
         self.accept('f', self.Fire)
+        self.accept('r', self.ActivateBoost)
     
     def HandleInto(self, entry):
         fromNode = entry.getFromNodePath().getName()
@@ -193,7 +207,9 @@ class Player(SphereCollideObject):
             self.taskMgr.remove('backward-thrust')
     
     def ApplyThrustBack(self, task):
-        rate = 5
+        rate = self.normalRate
+        if self.boosting:
+            rate *= self.boostSpeedMultiplier
         trajectory = self.modelNode.getRelativeVector(self.modelNode, Vec3.back())
         trajectory.normalize()
         self.modelNode.setFluidPos(self.modelNode.getPos() + trajectory * rate)
@@ -206,7 +222,9 @@ class Player(SphereCollideObject):
             self.taskMgr.remove('forward-thrust')
     
     def ApplyThrust(self, task):
-        rate = 5
+        rate = self.normalRate
+        if self.boosting:
+            rate *= self.boostSpeedMultiplier
         trajectory = self.modelNode.getRelativeVector(self.modelNode, Vec3.forward())
         trajectory.normalize()
         self.modelNode.setFluidPos(self.modelNode.getPos() + trajectory * rate)
@@ -219,7 +237,9 @@ class Player(SphereCollideObject):
             self.taskMgr.remove('upward-thrust')
             
     def ApplyThrustUp(self, task):
-        rate = 5
+        rate = self.normalRate
+        if self.boosting:
+            rate *= self.boostSpeedMultiplier
         trajectory = self.modelNode.getRelativeVector(self.modelNode, Vec3.up())
         trajectory.normalize()
         self.modelNode.setFluidPos(self.modelNode.getPos() + trajectory * rate)
@@ -232,7 +252,9 @@ class Player(SphereCollideObject):
             self.taskMgr.remove('downward-thrust')
     
     def ApplyThrustDown(self, task):
-        rate = 5
+        rate = self.normalRate
+        if self.boosting:
+            rate *= self.boostSpeedMultiplier
         trajectory = self.modelNode.getRelativeVector(self.modelNode, Vec3.down())
         trajectory.normalize()
         self.modelNode.setFluidPos(self.modelNode.getPos() + trajectory * rate)
@@ -245,7 +267,9 @@ class Player(SphereCollideObject):
             self.taskMgr.remove('right-thrust')
     
     def ApplyThrustRight(self, task):
-        rate = 5
+        rate = self.normalRate
+        if self.boosting:
+            rate *= self.boostSpeedMultiplier
         trajectory = self.modelNode.getRelativeVector(self.modelNode, Vec3.right())
         trajectory.normalize()
         self.modelNode.setFluidPos(self.modelNode.getPos() + trajectory * rate)
@@ -258,7 +282,9 @@ class Player(SphereCollideObject):
             self.taskMgr.remove('left-thrust')
     
     def ApplyThrustLeft(self, task):
-        rate = 5
+        rate = self.normalRate
+        if self.boosting:
+            rate *= self.boostSpeedMultiplier
         trajectory = self.modelNode.getRelativeVector(self.modelNode, Vec3.left())
         trajectory.normalize()
         self.modelNode.setFluidPos(self.modelNode.getPos() + trajectory * rate)
@@ -289,4 +315,40 @@ class Player(SphereCollideObject):
         else:
             self.taskMgr.remove('right-turn')
 
-    
+    def ActivateBoost(self):
+        if not self.boostCooldown and self.boostLeft > 0:
+            print("Boost activated!")
+            self.boosting = True
+            self.boostText.setText("BOOSTING!")
+            self.taskMgr.add(self.ApplyBoost, 'boost-timer')
+
+    def ApplyBoost(self, task):
+        if self.boostLeft <= 0:
+            print("Boost depleted.")
+            self.boosting = False
+            self.boostCooldown = True
+            self.boostText.setText("RECHARGING...")
+            self.taskMgr.doMethodLater(0.5, self.RechargeBoost, 'boost-recharge')
+            return Task.done
+        self.boostLeft -= globalClock.getDt() * self.boostRate
+        self.UpdateBoostBar()
+        return Task.cont
+
+    def RechargeBoost(self, task):
+        self.boostLeft += globalClock.getDt() * self.boostRechargeRate
+        self.UpdateBoostBar()
+
+        if self.boostLeft >= self.maxBoost:
+            self.boostLeft = self.maxBoost
+            self.boostCooldown = False
+            self.boostText.setText("")
+            return Task.done
+        return Task.cont
+
+    def UpdateBoostBar(self):
+        percent = max(0, (self.boostLeft / self.maxBoost) * 100)
+        self.boostBar['value'] = percent
+
+    def SetupBoostHUD(self):
+        self.boostBar = DirectWaitBar(text="", value=100, pos=(0, 0, -0.85), scale=0.3, barColor=(0.3, 0.7, 1.0, 1), frameColor=(0.2, 0.2, 0.2, 1))
+        self.boostText = OnscreenText(text="", pos=(0, -0.95), fg=(1, 1, 0, 1), scale=0.07, mayChange=True)

@@ -22,17 +22,17 @@ class MyGame(ShowBase):
         self.main_menu.hide()
         self.Universe = spaceJamClasses.Universe(self.loader, "Assets/Universe/Universe.x", self.render, 'Universe', "Assets/Universe/Universe.jpg", (0, 0, 0), 15000)
         
-        self.Planet1 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet1', "Assets/Planets/PlanetPsy.png", (150, 5000, 67), 350)
+        self.Planet1 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet1', "Assets/Planets/PlanetPsy.jpg", (150, 5000, 67), 350)
         
-        self.Planet2 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet2', "Assets/Planets/PlanetYinYang.png", (1150, 5000, 1067), 350)
+        self.Planet2 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet2', "Assets/Planets/PlanetYinYang.jpg", (1150, 5000, 1067), 350)
         
-        self.Planet3 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet3', "Assets/Planets/PlanetCleo.png", (2150, 5000, 2067), 350)
+        self.Planet3 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet3', "Assets/Planets/PlanetCleo.jpg", (2150, 5000, 2067), 350)
         
-        self.Planet4 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet4', "Assets/Planets/PlanetGamma.png", (3150, 5000, 3067), 350)
+        self.Planet4 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet4', "Assets/Planets/PlanetGamma.jpg", (3150, 5000, 3067), 350)
         
-        self.Planet5 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet5', "Assets/Planets/PlanetRadia.png", (4150, 5000, 4067), 350)
+        self.Planet5 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet5', "Assets/Planets/PlanetRadia.jpg", (4150, 5000, 4067), 350)
         
-        self.Planet6 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet6', "Assets/Planets/PlanetSangre.png", (5150, 5000, 5067), 350)
+        self.Planet6 = spaceJamClasses.Planet(self.loader, "Assets/Planets/protoPlanet.x", self.render, 'Planet6', "Assets/Planets/PlanetSangre.jpg", (5150, 5000, 5067), 350)
         
         
         self.SpaceStation = spaceJamClasses.SpaceStation(self.loader, "Assets/SpaceStation/spaceStation.x", self.render, 'Space Station', "Assets/SpaceStation/SpaceStation1_Dif2.png", (1500, 1000, -100), 40)
@@ -55,6 +55,9 @@ class MyGame(ShowBase):
         self.Sentinal2 = spaceJamClasses.Orbiter(self.loader, self.taskMgr, "Assets/DroneDefender/DroneDefender.obj", self.render, "Drone", 6.0, "Assets/DroneDefender/octotoad1_auv.png", self.Planet2, 500, "Cloud", self.SpaceShip)
         self.Sentinal3 = spaceJamClasses.Orbiter(self.loader, self.taskMgr, "Assets/DroneDefender/DroneDefender.obj", self.render, "Drone", 6.0, "Assets/DroneDefender/octotoad1_auv.png", self.Planet3, 900, "MLB", self.SpaceShip)
         self.Sentinal4 = spaceJamClasses.Orbiter(self.loader, self.taskMgr, "Assets/DroneDefender/DroneDefender.obj", self.render, "Drone", 6.0, "Assets/DroneDefender/octotoad1_auv.png", self.Planet4, 500, "Cloud", self.SpaceShip)
+        
+        self.Wanderer1 = spaceJamClasses.Wanderer(self.loader, "Assets/DroneDefender/DroneDefender.x", self.render, "Drone", 6.0, "Assets/DroneDefender/octotoad1_auv.png", self.SpaceShip)
+        self.Wanderer2 = spaceJamClasses.Wanderer2(self.loader, "Assets/DroneDefender/DroneDefender.x", self.render, "Drone", 6.0, "Assets/DroneDefender/octotoad1_auv.png", self.SpaceShip)
         
     def setup_game_elements(self):
         self.Drone = spaceJamClasses.Drone(self.loader, "Assets/DroneDefender/DroneDefender.x", self.render, 'Drone', "Assets/DroneDefender/Drones.jpg", (1000, 1200, 0), 50)
@@ -160,7 +163,7 @@ class MyGame(ShowBase):
     def ThirdPerson(self):
         self.camera.reparentTo(self.SpaceShip.modelNode)
         self.camera.setPos(self.SpaceShip.modelNode.getPos() + Vec3(-10, -10, 0))  # Set camera position behind the ship
-        self.camera.setFluidPos(0, -20, 5)
+        self.camera.setFluidPos(0, -50, 5)
 
     
         
